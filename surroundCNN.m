@@ -27,32 +27,35 @@ gtFiles = dir(gtFilePattern);
 %    struct('type', 'c', 'outputmaps', 6, 'kernelsize', 5) %convolution layer
 %};
 
-%define gaborfilter gb=gabor_fn(bw,gamma,psi,lambda,theta)
-% bw    = bandwidth, 
+%define gaborfilter gb=gabor_fn(sigma,gamma,psi,lambda,theta)
+
+ % bw    = bandwidth, 
 % gamma = aspect ratio,
 % psi   = phase shift, 
 % lambda= wave length,
 % theta = angle in rad, 
- 
-stdDeviation = 6;%p54 this is for coarse scale, =1.5 for fine scale
+sigma1 = 6;%p54 this is for coarse scale, =1.5 for fine scale
 aspectratio = 0.5; %paper p51
 bandwidth = 0.56; %sigma/lambda = 0.56 from paper p51
-orientation = [0 30 60 90 120 150 180 210 240 270 300 330]; %Number of Orientations used in paper = 12 from p53
-wavelength = stdDeviation/0.56; %p51
+orientation1 = 0; %Number of Orientations used in paper = 12 from p53
+wavelength = sigma1/0.56; %p51
 phaseOffset = [0 pi/2];
-gEven = gabor_fn(bandwidth, aspectratio, phaseOffset(1), wavelength ,orientation);
-gOdd = gabor_fn(bandwidth, aspectratio, phaseOffset(2), wavelength ,orientation);
+gEven = gabor_fn(bandwidth, aspectratio, 0, wavelength, orientation1);
+gOdd = gabor_fn(bandwidth, aspectratio, pi/2, wavelength, orientation1);
 
 %output Gabor maps
 disp('run forloop');
 for k = 1:length(natFiles)
   
-  outMagOdd = imgaborfilt(natFiles(k).name,gOdd);
-  outMagEven = imgaborfilt(natFiles(k).name,gEven);
+  
+  baseFileName = natFiles(k).name;
+  fullFileName = fullfile(naturalImagesFolder, baseFileName);
+  I = imread(fullFileName);
+  
+  outMagOdd = conv2(I, gOdd);
+  outMagEven = conv2(I, gEven);
 
-  imageArray = imread(outMagEven);
-  imageArray = imread(outMagOdd);
-  imshow(imageArray);
+  imagesc(outMagOdd);
   drawnow;
 end
 
@@ -67,30 +70,31 @@ end
 %train cnn
 %cnn = cnntrain(cnn, train_x, train_y, opts);
 
-function gb=gabor_fn(bw,gamma,psi,lambda,theta)
-% bw    = bandwidth, (1)
-% gamma = aspect ratio, (0.5)
-% psi   = phase shift, (0)
-% lambda= wave length, (>=2)
-% theta = angle in rad, [0 pi)
- 
-sigma = lambda/pi*sqrt(log(2)/2)*(2^bw+1)/(2^bw-1);
+end
+
+%gaborfilter from https://en.wikipedia.org/wiki/Gabor_filter
+function gb=gabor_fn(sigma,gamma,psi,lambda,theta)
+% sigma    = bandwidth, 
+% gamma = aspect ratio,
+% psi   = phase shift, 
+% lambda= wave length,
+% theta = angle in rad, 
+
 sigma_x = sigma;
 sigma_y = sigma/gamma;
 
-sz=fix(8*max(sigma_y,sigma_x));
-if mod(sz,2)==0, sz=sz+1;end
-
-% alternatively, use a fixed size
-% sz = 60;
- 
-[x y]=meshgrid(-fix(sz/2):fix(sz/2),fix(sz/2):-1:fix(-sz/2));
-% x (right +)
-% y (up +)
+% Bounding box
+nstds = 3;
+xmax = max(abs(nstds*sigma_x*cos(theta)),abs(nstds*sigma_y*sin(theta)));
+xmax = ceil(max(1,xmax));
+ymax = max(abs(nstds*sigma_x*sin(theta)),abs(nstds*sigma_y*cos(theta)));
+ymax = ceil(max(1,ymax));
+xmin = -xmax; ymin = -ymax;
+[x,y] = meshgrid(xmin:xmax,ymin:ymax);
 
 % Rotation 
 x_theta=x*cos(theta)+y*sin(theta);
 y_theta=-x*sin(theta)+y*cos(theta);
- 
-gb=exp(-0.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi/lambda*x_theta+psi);
-imshow(gb/2+0.5);
+
+gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi/lambda*x_theta+psi);
+end
