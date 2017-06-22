@@ -22,11 +22,6 @@ gtFiles = dir(gtFilePattern);
 %  drawnow; % Force display to update immediately.
 %end
 
-%build the CNN layer
-%cnn.layers = {
-%    struct('type', 'i') %input layer
-%    struct('type', 'c', 'outputmaps', 6, 'kernelsize', 5) %convolution layer
-%};
 
 %define gaborfilter gb=gabor_fn(sigma,gamma,psi,lambda,theta)
 
@@ -45,31 +40,43 @@ phaseOffset = [0 pi/2];
 gEven = gabor_fn(bandwidth, aspectratio, 0, wavelength, orientation1);
 gOdd = gabor_fn(bandwidth, aspectratio, pi/2, wavelength, orientation1);
 
+
+%build the CNN layer
+cnn.layers = {
+    struct('type', 'i') %input layer
+    struct('type', 'c', 'outputmaps', 6, 'kernelsize', 5) %convolution layer
+    struct('type', 's', 'scale', 2) %sub sampling layer
+    struct('type', 'c', 'outputmaps', 12, 'kernelsize', 5) %convolution layer
+    struct('type', 's', 'scale', 2) %subsampling layer
+};
+
 %output Gabor maps
 disp('run forloop');
 for k = 1:length(natFiles)
-  
-  
+ 
   baseFileName = natFiles(k).name;
   fullFileName = fullfile(naturalImagesFolder, baseFileName);
   I = imread(fullFileName);
   
   outMagOdd = conv2(I, gOdd);
-  
-  Is = imread(fullFileName);
-  outMagEven = conv2(Is, gEven);
+  outMagEven = conv2(I, gEven);
 
-  imshow(outMagOdd);
-  title('Odd');   
-  %drawnow;
-  
-  pause(pauseTime);
-  
-  imshow(outMagEven);
-  title('Even'); 
-  %drawnow;
-  pause(pauseTime);
+  outOdd = im
+  outEven{k} = imread(outMagEven);
+
 end
+
+cnn = cnnsetup(cnn, outOdd, outEven);
+
+opts.alpha = 1;
+opts.batchsize = 50;
+opts.numepochs = 1;
+
+cnn = cnntrain(cnn, outOdd, outEven, opts);
+
+%plot mean squared error
+figure; plot(cnn.rL);
+
 
 
 %setup cnn
