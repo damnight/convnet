@@ -85,11 +85,10 @@ imresize(testImage2, 0.0625);
 imresize(testImage3, 0.0625);
 imresize(testImage4, 0.0625);
 
-
 Istring = {'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\bear\bear.pgm', ...
     'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\goat\goat.pgm',  ...
     'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\elephant\elephant.pgm',  ...
-    'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\gazelle\gazelle.pgm'};
+    'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\gazelle.pgm'};
 
 I = [testImage1 testImage2 testImage3 testImage4];
 
@@ -101,15 +100,14 @@ labels = {'bear', 'goat', 'elephant','gazelle'};
 %imds = imageDatastore('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\bear.pgm', 'bear', ...
      %   'LabelSource','foldernames');
      
-     imds = imageDatastore(Istring, 'LabelSource', 'foldernames');
+     imds = imageDatastore(Istring, );
 
     
 %1.Initilize CNN
-conv_1 = convolution2dLayer(3, 32, 'Padding', 2, 'BiasLearnRateFactor', 2);
-conv_1.Weights = gpuArray(single(randn([3 3 5 32])*0.0001));
+conv1 = convolution2dLayer(5, varSize, 'Padding', 2, 'BiasLearnRateFactor', 2);
+conv1.Weights = gpuArray(single(randn([5 5 3 varSize])*0.0001));
 fc1 = fullyConnectedLayer(64, 'BiasLearnRateFactor',2);
-%fc1.Weights = gpuArray(single(randn([64 576])*0.1)); %this might be where
-%the weighting function goes, and it doesn't work
+fc1.Weights = gpuArray(single(randn([64 576])*0.1)); %this might be where the weighting function goes
 fc2 = fullyConnectedLayer(4, 'BiasLearnRateFactor',2);
 fc2.Weights = gpuArray(single(randn([4 64])*0.1));
 
@@ -117,16 +115,16 @@ fc2.Weights = gpuArray(single(randn([4 64])*0.1));
 
 %2.build the layers
 layers = [
-    imageInputLayer([32 32 1]);
-    convolution2dLayer([5 5], 12);
+    imageInputLayer([varSize varSize 3]);
+    conv1;
     maxPooling2dLayer(3, 'Stride', 2);
     reluLayer();
 
-    convolution2dLayer(3, 32, 'Padding', 2, 'BiasLearnRateFactor', 2);
+    convolution2dLayer(5, 32, 'Padding', 2, 'BiasLearnRateFactor', 2);
     reluLayer();
     averagePooling2dLayer(3, 'Stride', 2);
     
-    convolution2dLayer(3, 64, 'Padding', 2, 'BiasLearnRateFactor', 2);
+    convolution2dLayer(5, 64, 'Padding', 2, 'BiasLearnRateFactor', 2);
     reluLayer();
     averagePooling2dLayer(3, 'Stride', 2);
     
@@ -154,12 +152,10 @@ layers = [
     [net, info] = trainNetwork(imds, layers, opts);
     
     %5. analyise net
-    act1 = activations(net,imds,'conv_1','OutputAs','channels');
+    act1 = activations(net,im,'conv1','OutputAs','channels');
     sz = size(act1);
-    %act1 = reshape(act1,[sz(1) sz(2) 1 sz(3)]);
-    disp(size(act1));
-    imshow(act1(:,:,1,4)); %does it display something good or not?
-    %montage(mat2gray(act1),'Size',[8 12]);
+    act1 = reshape(act1,[sz(1) sz(2) 1 sz(3)]);
+    montage(mat2gray(act1),'Size',[8 12]);
     
 %cnn = cnntrain(cnn, train_x, train_y, opts);
 
