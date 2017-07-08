@@ -47,7 +47,7 @@ testImage4 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\conv
 sigma1 = 6;%p54 this is for coarse scale, =1.5 for fine scale
 aspectratio = 0.5; %paper p51
 bandwidth = 0.56; %sigma/lambda = 0.56 from paper p51
-orientation1 = 0; %Number of Orientations used in paper = 12 from p53
+orientation1 = 9999; %Number of Orientations used in paper = 12 from p53
 wavelength = sigma1/0.56; %p51
 phaseOffset = [0 pi/2];
 gEven = gabor_fn(bandwidth, aspectratio, 0, wavelength, orientation1);
@@ -76,25 +76,15 @@ I = [testImage1 testImage2 testImage3 testImage4];
   %baseFileName = natFiles(k).name;
   %fullFileName = fullfile(naturalImagesFolder, baseFileName);
 
+  %run for loop to give me all the energy maps
+for i = 1:4
+  outMagEven = conv2(I(i), gEven);
+  outMagOdd = conv2(I(i), gOdd);
   
-  outMagOdd = conv2(I, gOdd);
-
-  outMagEven = conv2(I, gEven);
-
-  %imshow(outMagOdd);
-  %title('Odd');   
-  %drawnow;
-  
-  %pause(pauseTime);
-  
-  %imshow(outMagEven);
-  %title('Even'); 
-  %drawnow;
-  %pause(pauseTime);
-  
-  Igabor = sqrt(outMagOdd.^2 + outMagEven.^2);
+  Igabor.i = sqrt(outMagOdd.^2 + outMagEven.^2);
  
-%end
+  imshow(Igabor.i);
+end
 
 %setup cnn
 varSize = 32;
