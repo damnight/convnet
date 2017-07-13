@@ -1,62 +1,82 @@
 function SurroundCNNMonday
 
-%TO CHANGE load test images
-testImage1 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\bear.pgm');
-testImage2 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\goat.pgm');
-testImage3 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\elephant.pgm');
-testImage4 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\gazelle.pgm');
+% %TO CHANGE load test images
+% testImage1 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\bear.pgm');
+% testImage2 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\goat.pgm');
+% testImage3 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\elephant.pgm');
+% testImage4 = imread('D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images\gazelle.pgm');
+% 
+% %TO CHANGE resize images
+% testImage1 = imresize(testImage1, 0.0625);
+% testImage2 = imresize(testImage2, 0.0625);
+% testImage3 = imresize(testImage3, 0.0625);
+% testImage4 = imresize(testImage4, 0.0625);
+% 
+% %TO CHANGE save in Array structure
+% I = [testImage1 testImage2 testImage3 testImage4];
 
-%TO CHANGE resize images
-testImage1 = imresize(testImage1, 0.0625);
-testImage2 = imresize(testImage2, 0.0625);
-testImage3 = imresize(testImage3, 0.0625);
-testImage4 = imresize(testImage4, 0.0625);
+%initialize imds
+    naturalImagesFolder = 'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images';
+    natFilePattern = fullfile(naturalImagesFolder, '*.pgm');
+    natFiles = dir(natFilePattern);
+    baseFileName = natFiles().name;
+    fullFileName = fullfile(naturalImagesFolder, baseFileName);
+    %imds = imageDatastore(natFilePattern, 'LabelSource', 'foldernames');  
+    imds = imageDatastore(fullfile(naturalImagesFolder, baseFileName), 'LabelSource', 'foldernames');
+    %DEBUG 
+    %disp(size(imds));    
+    imds.ReadFcn = @(fullFileName)readAndPreprocessImage(fullFileName);
+        Iout = readAndPreprocessImage(fullFileName);    
 
-%TO CHANGE save in Array structure
-I = [testImage1 testImage2 testImage3 testImage4];
-
-%TO CHANGE setup gabor settings
-sigma1 = 6;%p54 this is for coarse scale, =1.5 for fine scale
-aspectratio = 0.5; %paper p51
-bandwidth = 0.56; %sigma/lambda = 0.56 from paper p51
-orientation1 = 90; %Number of Orientations used in paper = 12 from p53
-wavelength = sigma1/0.56; %p51
-phaseOffset = [0, pi/2];
-gEven = gabor_fn(bandwidth, aspectratio, phaseOffset(1), wavelength, orientation1);
-gOdd = gabor_fn(bandwidth, aspectratio, phaseOffset(2), wavelength, orientation1);
-
-
-%TO CHANGE initialize actMaps variable
-actMaps = zeros(32);
-actMaps(:,:,2) = zeros(32);
-%TO CHANGE run gabor filtering even/odd per orientation
-for index = 1:4
-  outMagEven = conv2(testImage1, gEven, 'same');
-  outMagOdd = conv2(testImage1, gOdd, 'same');
-  
-  disp(size(outMagEven));
-  imshow(outMagEven);
-  title('even');
-  pause(0.5);
-  imshow(outMagOdd);
-  title('odd');
-  pause(0.5);
-  
-  Igabor = sqrt(outMagOdd.^2 + outMagEven.^2);
- 
-  disp(size(Igabor));
+%setup CNN
+%1.Initiate
 
   
-  imshow(Igabor);
-  title(index);
-  pause(1);
-  
-  actMaps(:,:,index) = Igabor;
-end
+conv_1 = convolution2dLayer(4, 32, 'Padding', 2, 'Stride', 1, 'BiasLearnRateFactor', 2, 'NumChannels' , 1);
+conv_1.Weights = DoG([4 4], 4) * 
 
-%DEBUG
-img = actMaps(:,:,1);
-imshow(img);
-title('img at second layer');
+fc1 = fullyConnectedLayer(1, 'BiasLearnRateFactor',2);
+fc1.Weights = gpuArray(single(randn([1 1])*0.1));
+
+fc2 = fullyConnectedLayer(1, 'BiasLearnRateFactor',2);
+fc2.Weights = gpuArray(single(randn([1 64])*0.1));
+
+%2. Layers
+layers = [
+    imageInputLayer([32 32 1]);
+    conv_1;
+    reluLayer();
+    softmaxLayer();
+    classificationLayer();
+   
+];
+    
+
+
+    %3. training options
+    opts = trainingOptions('sgdm', ...
+    'InitialLearnRate', 0.001, ...
+    'LearnRateSchedule', 'piecewise', ...
+    'LearnRateDropFactor', 0.1, ...
+    'LearnRateDropPeriod', 8, ...
+    'L2Regularization', 0.004, ...
+    'MaxEpochs', 10, ...
+    'MiniBatchSize', 100, ...
+    'Verbose',true);
+    
+    
+    %4. train cnn
+    [net, info] = trainNetwork(imds, layers, opts);
+    
+    %5. analyise net
+    act1 = activations(net,imds,'conv_1','OutputAs','channels');
+    sz = size(act1);
+    %act1 = reshape(act1,[sz(1) sz(2) 1 sz(3)]);
+    disp(size(act1));
+    imshow(act1(:,:,1,4)); %does it display something good or not?
+    %montage(mat2gray(act1),'Size',[8 12]);
+    
+%cnn = cnntrain(cnn, train_x, train_y, opts);
+
 
 end
