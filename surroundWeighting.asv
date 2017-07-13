@@ -32,15 +32,13 @@ for ii=1:size(actualImage,1)
                           yy xx];
                 spWeight = spatialWeighting(coords);
                 
-                %multiply (11) the weights into single weighting value
-                localweight = spWeight * orWeight;
+                %convolute the weights into single weigh
+                localweight = conv2(spWeight, orWeight);
                 
-                %accumulate the weights from all the different cells in the
-                %surround region
                 cumulativeWeight = localweight + cumulativeWeight; 
             end
         end 
-    end
-end
+
 surroundWeight = cumulativeWeight;
+    end
 end
