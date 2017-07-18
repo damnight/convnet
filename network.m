@@ -48,8 +48,8 @@ net.layers{2}.transferFcn = ''; %endreion functions
 net.layers{2}.initFcn = 'initwb'; %https://de.mathworks.com/help/nnet/ref/init.html
 
 %set third layer neurons
-net.layers{2}.size = 8; %1/4 of previous neurons or maybe 4 times as many? really no clue atp
-net.layers{2}.transferFcn = '';
+net.layers{3}.size = 8; %1/4 of previous neurons or maybe 4 times as many? really no clue atp
+net.layers{3}.transferFcn = '';
 net.layers{3}.initFcn = 'initnw';
 
 %initialization, training, evaluation
@@ -58,5 +58,42 @@ net.trainFcn = 'trainlm'; %not sure if best training function
 net.performFcn = 'mse'; %not sure it's usable since there must be layer in which it's tested, which currently resides outside the net
 
 
+%initialize imds
+    naturalImagesFolder = 'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images';
+    %naturalImagesFolder = 'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images';
+    natFilePattern = fullfile(naturalImagesFolder, '*.pgm');
+    natFiles = dir(natFilePattern);
+    baseFileName = natFiles().name;
+    fullFileName = fullfile(naturalImagesFolder, baseFileName);
+    %imds = imageDatastore(natFilePattern, 'LabelSource', 'foldernames');  
+    imds = imageDatastore(fullfile(naturalImagesFolder, baseFileName), 'LabelSource', 'foldernames');
+    %DEBUG 
+    %disp(size(imds));    
+    imds.ReadFcn = @(fullFileName)preprocessImage(fullFileName);
+        Iout = preprocessImage(fullFileName);    
 
+    %0. training options
+    opts = trainingOptions('sgdm', ...
+    'InitialLearnRate', 0.001, ...
+   'LearnRateSchedule', 'piecewise', ...
+    'LearnRateDropFactor', 0.1, ...
+   'LearnRateDropPeriod', 8, ...
+    'L2Regularization', 0.004, ...
+    'MaxEpochs', 10, ...
+    'MiniBatchSize', 100, ...
+    'Verbose',true);
+    
+    
+    %1. train cnn
+    net = init(net);
+    net = train(net,imds);
+    view(net);
 
+  
+    %3. analyise net
+    act1 = activations(net,imds,'conv_1','OutputAs','channels');
+    sz = size(act1);
+    %act1 = reshape(act1,[sz(1) sz(2) 1 sz(3)]);
+    disp(size(act1));
+    imshow(act1(:,:,1,4)); %does it display something good or not?
+    %montage(mat2gray(act1),'Size',[8 12]);

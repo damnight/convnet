@@ -1,6 +1,7 @@
 %figure out the weighing for the surroundInhibition
 function surroundWeight = surroundWeighting(image, k)
 %prep variables
+%k is the radius multiplier between CRF and nCRF
 orientationList = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330};
 actualImage = image(:,:,1);
 orientationMap = image(:,:,2);
