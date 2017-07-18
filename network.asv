@@ -38,31 +38,31 @@ net.inputs{1}.processFcns = {'preprocessImage'};
 %set first layer neurons: surrWeighting
 net.layers{1}.size = 32; %one neuron per pixel?
 net.layers{1}.transferFcn = 'WDoG'; %part of the weighting function Ws*WDoG = Wside (11)
-
+net.layers{1}.initFcn = 'initwb'; %https://de.mathworks.com/help/nnet/ref/init.html
 
 %set second layer neurons: maxpooling to 28x28
 net.layers{2}.size = 28; %one neuron per pixel?
-net.layers{2}.transferFcn = 'maxPooling2dLayer'; %endregion functions
+net.layers{2}.transferFcn = ''; %endregion functions
+net.layers{2}.initFcn = 'initwb'; %https://de.mathworks.com/help/nnet/ref/init.html
 
 %set third layer neurons: adptEndWeighting
-net.layers{3}.size = 28;
-net.layers{3}.transferFcn = 'adptEndInhib';
-
+net.layers{3}.size = 8; %1/4 of previous neurons or maybe 4 times as many? really no clue atp
+net.layers{3}.transferFcn = '';
+net.layers{3}.initFcn = 'initnw';
 
 %set fourth layer neurons: extAdptEndWeighting
-net.layers{4}.size = 28;
-net.layers{4}.transferFcn = 'apdtEndInhibExt';
-
-
+net.layers{4}.size = 8; 
+net.layers{4}.transferFcn = 
+net.layers{4}.initFcn = 
 %set fifth layer neurons: E-surround-end
-net.layers{5}.size = 28;
-net.layers{5}.transferFcn = 'convInhibition';
-
+net.layers{5}.size = 
+net.layers{5}.transferFcn = 
+net.layers{5}.initFcn = 
 
 %set sixth layer neurons: binarization
-net.layers{6}.size = 1;
-net.layers{6}.transferFcn = 'im2bw';
-
+net.layers{6}.size = 
+net.layers{6}.transferFcn = 
+net.layers{6}.initFcn =
 %initialization, training, evaluation
 net.initFcn = 'initlay'; %https://de.mathworks.com/help/nnet/ref/initlay.html?searchHighlight=initlay&s_tid=doc_srchtitle
 net.trainFcn = 'trainlm'; %not sure if best training function
