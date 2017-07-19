@@ -1,27 +1,34 @@
 net = network;
 
 net.numInputs = 1; %one 32x32 preProc image (gabor energy map)
-net.numLayers = 7; 
+net.numLayers = 6; 
 
+%layernames:
+net.layers{1}.name = 'surroundinhib';
+net.layers{2}.name = 'maxpooling';
+net.layers{3}.name = 'adtEndWeighting';
+net.layers{4}.name = 'extAdtEndWeighting';
+net.layers{5}.name = 'InhibitionLayer';
+net.layers{6}.name = 'binarizationLayer';
 %biases (E5, and E4 may be realised this way)
 
 %input connections: inputConnect(layer,input)
 %input -> 1,2,3,5
 net.inputConnect(1,1) = 1;
-net.inputConnect(1,2) = 1;
-net.inputConnect(1,3) = 1;
-net.inputConnect(1,5) = 1;
+net.inputConnect(2,1) = 1;
+net.inputConnect(3,1) = 1;
+net.inputConnect(5,1) = 1;
 
 
 %layer connections: layerConnect(targetLayer.sourceLayer)
 %1 -> 5,3
 %rest consecutive
-net.layerConnect(5.1) = 1;
-net.layerConnect(5.3) = 1;
-net.layerConnect(3.2) = 1;
-net.layerConnect(4.3) = 1;
-net.layerConnect(5.4) = 1;
-net.layerConnect(6.5) = 1;
+net.layerConnect(5,1) = 1;
+net.layerConnect(5,3) = 1;
+net.layerConnect(3,2) = 1;
+net.layerConnect(4,3) = 1;
+net.layerConnect(5,4) = 1;
+net.layerConnect(6,5) = 1;
 
 
 %output connections: outputConnect [layer1 layer2 layer3] (indicate with
@@ -29,7 +36,12 @@ net.layerConnect(6.5) = 1;
 net.outputConnect = [0 0 0 0 0 1]; %layer 6 connects to output
 
 %preprocessing functions for the inputs: inputs{layerIndex}.processFcns
-net.inputs{1}.processFcns = {'preprocessImage'};
+%example inputs
+exampleMap = zeros(32);
+net.layers{1}.dimensions = 2;
+net.inputs{1}.size = 32;
+net.inputs{1}.exampleInput = exampleMap;
+
 
 
 %size = #ofNeurons
@@ -37,8 +49,8 @@ net.inputs{1}.processFcns = {'preprocessImage'};
 %initFcn = initialization function
 %set first layer neurons: surrWeighting
 net.layers{1}.size = 32; %one neuron per pixel?
-net.layers{1}.transferFcn = 'WDoG'; %part of the weighting function Ws*WDoG = Wside (11)
-
+net.layers{1}.transferFcn = 'surroundWeighting'; %part of the weighting function Ws*WDoG = Wside (11)
+net.layers{1}.exampleInput = exampleMap;
 
 %set second layer neurons: maxpooling to 28x28
 net.layers{2}.size = 28; %one neuron per pixel?
@@ -60,6 +72,7 @@ net.layers{5}.transferFcn = 'convInhibition';
 
 
 %set sixth layer neurons: binarization
+clearall;
 net.layers{6}.size = 1;
 net.layers{6}.transferFcn = 'im2bw';
 

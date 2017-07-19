@@ -22,19 +22,22 @@ function SurroundCNNMonday
     natFiles = dir(natFilePattern);
     baseFileName = natFiles().name;
     fullFileName = fullfile(naturalImagesFolder, baseFileName);
-    %imds = imageDatastore(natFilePattern, 'LabelSource', 'foldernames');  
-    imds = imageDatastore(fullfile(naturalImagesFolder, baseFileName), 'LabelSource', 'foldernames');
+    %imds = imageDatastore(natFilePattern, 'LabelSource', 'foldernames'); 
+    
+    imds = imageDatastore(fullfile(naturalImagesFolder));
+    imds.ReadFcn = @preprocessImage;
     %DEBUG 
-    %disp(size(imds));    
-    imds.ReadFcn = @(fullFileName)preprocessImage(fullFileName);
-        Iout = preprocessImage(fullFileName);    
-
+    disp(size(imds));    
+    %disp(readall(imds));
+           
+    disp(imds);
 %setup CNN
 %1.Initiate
 
-  
+
 conv_1 = convolution2dLayer(4, 32, 'Padding', 2, 'Stride', 1, 'BiasLearnRateFactor', 2, 'NumChannels' , 1);
-%conv_1.Weights = DoG([4 4], 4) * 
+disp(conv_1);
+conv_1.Weights = surroundWeighting;
 
 fc1 = fullyConnectedLayer(1, 'BiasLearnRateFactor',2);
 fc1.Weights = gpuArray(single(randn([1 1])*0.1));
@@ -44,7 +47,7 @@ fc2.Weights = gpuArray(single(randn([1 64])*0.1));
 
 %2. Layers
 layers = [
-    imageInputLayer([32 32 1]);
+    imageInputLayer([32 32 12]);
     conv_1;
     reluLayer();
     softmaxLayer();
