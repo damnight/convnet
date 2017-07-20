@@ -10,9 +10,7 @@ k = 4;
 % loop over all rows and columns
 for ii=1:size(actualImage,1)
     for jj=1:size(actualImage,2)        
-        %get the actual pixel values
-        %imageOrientations is an array that stores the orientation values (0-11)
-        actualOrr = orientationList(orientationMap(ii, jj)); %this should return a value between 0-330    
+
         %startpoint of surround region is the top left corner, so transposing:
 
         yy = ii-(k-2); 

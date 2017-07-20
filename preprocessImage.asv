@@ -27,14 +27,14 @@ for orr = 2:13 %all the orientations
   actMaps(:,:,orr) = energyMap;
 end
     
-% imshow(actMaps(:,:,1),'InitialMagnification',500);
-% pause(0.5);
-% imshow(actMaps(:,:,2),'InitialMagnification',500);
-% pause(1);
-% imshow(actMaps(:,:,7),'InitialMagnification',500);
-% pause(1);
-% imshow(actMaps(:,:,9),'InitialMagnification',500);
-% pause(1);
+imshow(actMaps(:,:,1));
+pause(0.5);
+imshow(actMaps(:,:,2));
+pause(1);
+imshow(actMaps(:,:,7));
+pause(1);
+imshow(actMaps(:,:,9));
+pause(1);
 disp(size(actMaps));
 Iout = actMaps;
 

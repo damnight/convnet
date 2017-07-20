@@ -25,6 +25,7 @@ net.inputConnect(5,1) = 1;
 %rest consecutive
 net.layerConnect(5,1) = 1;
 net.layerConnect(5,3) = 1;
+net.layerConnect(3,1) = 1;
 net.layerConnect(3,2) = 1;
 net.layerConnect(4,3) = 1;
 net.layerConnect(5,4) = 1;
