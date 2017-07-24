@@ -22,12 +22,12 @@ xmin = -xmax; ymin = -ymax;
 x_theta=x*cos(theta)+y*sin(theta);
 y_theta=-x*sin(theta)+y*cos(theta);
 
-if (psi == pi/2) || (psi == 3/2*pi) %even
-gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi*x_theta/lambda + psi);
-elseif (psi == 0) || (psi == pi) || (psi == 2*pi) %odd
-gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*sin(2*pi*x_theta/lambda + psi);
-else
-gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi/lambda*x_theta+psi); 
+% if (psi == pi/2) || (psi == 3/2*pi) %even
+% gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi*x_theta/lambda + psi);
+% elseif (psi == 0) || (psi == pi) || (psi == 2*pi) %odd
+% gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*sin(2*pi*x_theta/lambda + psi);
+% else
+%gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*cos(2*pi/lambda*x_theta+psi); 
 
-
+gb= exp(-.5*(x_theta.^2/sigma_x^2+y_theta.^2/sigma_y^2)).*sin(2*pi/lambda*x_theta+psi);
 end
