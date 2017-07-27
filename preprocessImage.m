@@ -23,7 +23,7 @@ for orr = 2:13 %all the orientations
   outMagOdd = conv2(I, gaborFilter(orr-1, 'odd'), 'same');
   
   energyMap = sqrt(outMagOdd.^2 + outMagEven.^2);
-  disp(size(energyMap));
+  %disp(size(energyMap));
   actMaps(:,:,orr) = energyMap;
 end
 %   

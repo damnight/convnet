@@ -1,25 +1,38 @@
 function extWeightMask = apdtEndInhibExt_new(wImage)
 
-mask = zeros(size(image(1)));
+mask = zeros(520);
 faciValue = 0.3;
+disp('wImage');
+disp(size(wImage));
 
-for x = 1:size(wImage(1))
-    for y = 1:size(wImage(2))
-
-        lOrient = maxEnLoc(image, x,y); %returns [maxEnergy, orientationIndex]
+for x = 1:520
+    for y = 1:520
+        %disp(size(wImage));
         
+        lOrient = maxEnLoc(wImage, x,y); %returns [maxEnergy, orientationIndex]
+        %disp(lOrient);
         %energy = lOrient(1);
-        orient = lOrient(2);
-        checker = checkForOrientationHood(image, orient, x, y);
+        orient = lOrient(1);
+        %figure(2);
+        %imshow(wImage);
+        [hasNeightbor, hasNeightborAt] = checkForOrientationHood(wImage, orient, x, y);
+
+%         disp('has neighbor at [left-coord right-coord]');
+%         disp(hasNeightborAt);
+%         disp('has a neighbor [left right]');
+%         disp(hasNeightbor);
+
         
-        if(checker(1)) %returns true if correct orientation is found
+        if(hasNeightbor(1)) %returns true if correct orientation is found
             mask(x,y) = faciValue;
-            [i, j] = checker(2,1); %coordR
+            [i, j] = hasNeightborAt(1); %coordR
             mask(i,j) = faciValue;
-        elseif(checker(2)) %returns true if correct orientation is found
+            %disp(mask(i, j));
+        elseif(hasNeightbor(2)) %returns true if correct orientation is found
             mask(x,y) = faciValue;
-            [i, j] = checker(2,2); %coordL
+            [i, j] = hasNeightborAt(2); %coordL
             mask(i,j) = faciValue;
+            %disp(mask(i, j));
         end
                          
         
@@ -27,5 +40,6 @@ for x = 1:size(wImage(1))
 end
 
 extWeightMask = mask;
+%disp(mask);
 
 end

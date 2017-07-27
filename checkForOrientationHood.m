@@ -1,82 +1,194 @@
-function hasNeighbor = checkForOrientationHood(image, orient, x, y)
+function [hasNeighborT, hasNeightborAt] = checkForOrientationHood(image, orient, x, y)
 %right, left
 %up, down
 %rightUp, leftDown
 %rightDown, leftUp
-hasNeighborT = [false, false; coordR, coordL];
+%disp(orient);
+
+hasNeighborT = [false, false]; 
+hasNeightborAt = [[0 0], [0 0]];
+%disp(hasNeightborAt);
 
 switch orient
-    case 1 %0       
-        rightOrient = maxEnLoc(image, x+1,y);
-        leftOrient = maxEnLoc(image, x-1,y);
+    case 0 %the padding
+       hasNeighborT = [false, false]; 
+       hasNeightborAt = [[0 0], [0 0]];
         
-        if(rightOrient(2) == orient)
+    case 1 %0       
+        [energy, rightOrient] = maxEnLoc(image, x+1,y);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y);
+        %disp(rightOrient);
+        if(rightOrient == orient)
             hasNeighborT(1,1) = true;
-            hasNeighborT(2,1) = [x+1, y];
-            if(leftOrient(2) == orient)
+            hasNeightborAt(1,1) = [x+1, y];
+            if(leftOrient == orient)
                 hasNeighborT(1,2) = true;
-                hasNeighborT(2,2) = [ x-1,y];
+                hasNeightborAt(1,2) = [ x-1,y];
             end
         end
-        hasNeighbor = hasNeighborT;
+        %disp(hasNeighborT);
+
         
-    case 2 %15
+    case 2 %15 
+                [energy, rightOrient] = maxEnLoc(image, x+1,y);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y);
+        %disp(rightOrient);
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1, y];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [ x-1,y];
+            end
+        end
+        %disp(hasNeighborT);
+
         
-    case 3 %30
+    case 3 %30  
+        [energy, rightOrient] = maxEnLoc(image, x+1,y);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y);
+        %disp(rightOrient);
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1, y];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [ x-1,y];
+            end
+        end
+        %disp(hasNeighborT);
+
         
     case 4 %45
-        rightOrient = maxEnLoc(image, x+1,y+1);
-        leftOrient = maxEnLoc(image, x-1,y-1);
+        [energy, rightOrient] = maxEnLoc(image, x+1,y+1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y-1);
         
-        if(rightOrient(2) == orient)
+        if(rightOrient == orient)
             hasNeighborT(1,1) = true;
-            hasNeighborT(2,1) = [x+1,y+1];
-            if(leftOrient(2) == orient)
+            hasNeightborAt(1,1) = [x+1,y+1];
+            if(leftOrient == orient)
                 hasNeighborT(1,2) = true;
-                hasNeighborT(2,2) =  [x-1,y-1];
+                hasNeightborAt(1,2) =  [x-1,y-1];
             end
         end
-        hasNeighbor = hasNeighborT;
         
-    case 5 %60
+    case 5 %60   
+             [energy, rightOrient] = maxEnLoc(image, x+1,y+1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y-1);
         
-    case 6 %75
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1,y+1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) =  [x-1,y-1];
+            end
+        end
+
+        
+    case 6 %75    
+              [energy, rightOrient]= maxEnLoc(image, x+1,y+1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y-1);
+        
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1,y+1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) =  [x-1,y-1];
+            end
+        end
+
         
     case 7 %90
-        rightOrient = maxEnLoc(image, x,y+1);
-        leftOrient = maxEnLoc(image, x,y-1);
+     [energy, rightOrient] = maxEnLoc(image, x,y+1);
+       [energyl, leftOrient] = maxEnLoc(image, x,y-1);
         
-        if(rightOrient(2) == orient)
+        if(rightOrient == orient)
             hasNeighborT(1,1) = true;
-            hasNeighborT(2,1) = [ x,y+1];
-            if(leftOrient(2) == orient)
+            hasNeightborAt(1,1) = [ x,y+1];
+            if(leftOrient == orient)
                 hasNeighborT(1,2) = true;
-                hasNeighborT(2,2) = [x,y-1];
+                hasNeightborAt(1,2) = [x,y-1];
             end
         end
-        hasNeighbor = hasNeighborT;
+
         
     case 8 %105
+         [energy, rightOrient] = maxEnLoc(image, x,y+1);
+        [energyl, leftOrient] = maxEnLoc(image, x,y-1);
         
-    case 9 %120
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [ x,y+1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [x,y-1];
+            end
+        end
+
+        
+    case 9 %120 
+        [energy, rightOrient] = maxEnLoc(image, x,y+1);
+        [energyl, leftOrient] = maxEnLoc(image, x,y-1);
+        
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [ x,y+1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [x,y-1];
+            end
+        end
+
         
     case 10 %135
-        rightOrient = maxEnLoc(image, x+1,y-1);
-        leftOrient = maxEnLoc(image, x-1,y+1);
+        [energy, rightOrient] = maxEnLoc(image, x+1,y-1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y+1);
         
-        if(rightOrient(2) == orient)
+        if(rightOrient == orient)
             hasNeighborT(1,1) = true;
-            hasNeighborT(2,1) = [x+1,y-1];
-            if(leftOrient(2) == orient)
+            hasNeightborAt(1,1) = [x+1,y-1];
+            if(leftOrient == orient)
                 hasNeighborT(1,2) = true;
-                hasNeighborT(2,2) = [x-1,y+1];
+                hasNeightborAt(1,2) = [x-1,y+1];
+            end
+        end
+
+        
+    case 11 %150
+         [energy, rightOrient] = maxEnLoc(image, x+1,y-1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y+1);
+        
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1,y-1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [x-1,y+1];
             end
         end
         
-        hasNeighbor = hasNeighborT;
-    case 11 %150
+
         
     case 12 %165
+        [energy, rightOrient] = maxEnLoc(image, x+1,y-1);
+        [energyl, leftOrient] = maxEnLoc(image, x-1,y+1);
+        
+        if(rightOrient == orient)
+            hasNeighborT(1,1) = true;
+            hasNeightborAt(1,1) = [x+1,y-1];
+            if(leftOrient == orient)
+                hasNeighborT(1,2) = true;
+                hasNeightborAt(1,2) = [x-1,y+1];
+            end
+        end
+
+        
+    otherwise
+       hasNeighborT = [false, false]; 
+       hasNeightborAt = [[0 0], [0 0]];
+        
 end
 
 
