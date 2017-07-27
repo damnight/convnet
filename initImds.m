@@ -1,7 +1,7 @@
 function imds = initImds
 
-    naturalImagesFolder = 'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images';
     %naturalImagesFolder = 'D:\User\Marco\Documents\!Studium\Informatik\VIP\matlab\convnet\images';
+    naturalImagesFolder = 'C:\Users\Marco\Documents\Studium\VIP\convnet\images';
     natFilePattern = fullfile(naturalImagesFolder, '*.pgm');
     natFiles = dir(natFilePattern);
     baseFileName = natFiles().name;
