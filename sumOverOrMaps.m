@@ -6,19 +6,25 @@ function sum = sumOverOrMaps(image, target, original) %target[x,y] is the target
 
 i = target(1);
 j = target(2);
+%disp(i);
+%disp(j);
 accumulator = 0;
 sp = spatialWeighting(target, original); %orgImage, target_x, target_y, source = [x, y]; 
 
-dim = image(:,:,2);
-disp(dim);
+%dim = image(:,:,2);
+%disp(size(image));
+%disp(dim);
 for q = 2:13
 
     targetLayerAtPosition = image(i,j,q);
+    %disp(targetLayerAtPosition);
     accumulator = accumulator + (orWeight(original, targetLayerAtPosition) * sp);
     
     
 end
 
-sum = accumulator;
+
+sum = accumulator * 0.001;
+%disp(sum);
 
 end

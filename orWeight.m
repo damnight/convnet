@@ -5,6 +5,8 @@ function orWeight = orWeight(actualOrr, targetOrr)
 %we want to find a Delta to describe how different they are, opposing
 %directions are most different
 k=1;
-orWeight = (1/2)*(1+cos(targetOrr - actualOrr))^k;
+orientation = (1/2) *(1 + cos(double(targetOrr) - double(actualOrr))) .^ k;
+
+orWeight = orientation(1);
 
 end

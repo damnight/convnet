@@ -1,7 +1,6 @@
-function max = maxEn(image)
+function Iout = maxEn(I)
 
-[imageHeight, imageLength, imageDepth] = size(image);
-
+[imageHeight, imageLength, imageDepth] = size(I);
 
 %initialize energymaps
 energyMapsO = zeros(imageHeight);
@@ -10,15 +9,19 @@ energyMapsO(:,:,2) = zeros(imageHeight);
 %run gabor filtering even/odd per orientation
 
     for orr = 1:12 %all the orientations
-  outMagEven = conv2(I, gaborFilter(orr, 'even'), 'same');
-  outMagOdd = conv2(I, gaborFilter(orr, 'odd'), 'same');
+        %disp(size(I));
+
+        imageHeight;
+        
+  outMagEven = conv2(I(:,:,1), gaborFilter(orr, 'even'), 'same');
+  outMagOdd = conv2(I(:,:,1), gaborFilter(orr, 'odd'), 'same');
+
   
   energyMap = sqrt(outMagOdd.^2 + outMagEven.^2);
-  disp(size(energyMap));
   energyMapsO(:,:,orr) = energyMap;
     end
-    
-    disp(size(energyMapsO));
+    %disp('size maxEn energyMaps');
+    %disp(size(energyMapsO));
 %actMap are the maps maximized over the orientations
 actMaps = zeros(imageHeight);
 actMaps(:,:,1) = zeros(imageHeight);
@@ -31,15 +34,23 @@ actMaps(:,:,2) = zeros(imageHeight);
 for k = 1:12 %all the orientations
     
     for n = 1:imageLength
-        for m = 1:imageHeight         
-        actMaps(n,m,1) = max(energyMapsO(n,m,k), actMaps(n,m,1)); %set the values
+        for m = 1:imageHeight
+            A = energyMapsO(n,m,k);
+            B = actMaps(n,m,1);
+            
+        actMaps(n,m,1) = max(A, B); %set the values
         if(energyMapsO(n,m,k) >=  actMaps(n,m,1))
              actMaps(n,m,2) = k;
         end
         end
     end
 end
-%disp(actMaps);
+
+% figure()
+% subplot(1,2,1), imshow(floor(actMaps(:,:,1))), title('actMaps 1st layer');
+% subplot(1,2,2), imshow(floor(actMaps(:,:,2))), title('actMaps 2nd layer');
+%disp(actMaps(:,:,1));
+disp('size actMaps maxEn: ');
 disp(size(actMaps));
 Iout = actMaps(:,:,1);
 

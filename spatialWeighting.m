@@ -3,4 +3,6 @@ function sWeight = spatialWeighting(target, source)
 
 sWeight = sqrt(sum((target - source) .^ 2));
 
+%disp(sWeight);
+
 end
