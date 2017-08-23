@@ -13,7 +13,7 @@ function Iout = preprocessImage(fullFileName)
 
 
         %initialize energymaps
-actMaps = I;
+actMaps = I; %im2double(I);
 actMaps(:,:,2) = zeros(512);
 
 %TO CHANGE run gabor filtering even/odd per orientation
